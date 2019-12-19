@@ -22,13 +22,13 @@ class HandleVerifySign
         //检查签名
         $clientSign = $request->input('sign',false);
         if ($clientSign === false){
-            return Response::json(['code' => 401, 'msg' => '非法请求']);
+            return Response::json(['code' => 1403, 'msg' => '非法请求']);
         }
         // 检查时间戳
         $timestamp = $request->input('timestamp');
         $now = time();
         if (!$timestamp || !is_numeric($timestamp) || $timestamp < $now - 60 * 5 || $timestamp > $now + 60 * 5) {
-            return Response::json(['code' => 401, 'msg' => '请求过期']);
+            return Response::json(['code' => 1403, 'msg' => '请求过期']);
         }
 
         $data['uid'] = $request->input('uid');
@@ -41,7 +41,7 @@ class HandleVerifySign
 
         //验证参数正确性
         if (!in_array($data['clientType'],app('config')->get('middleware.sign.key'))){
-            return Response::json(['code' => 401, 'msg' => '非法请求']);
+            return Response::json(['code' => 1403, 'msg' => '非法请求']);
         }
 
         $secret = app('config')->get('middleware.sign.secret')[$data['clientType']];
@@ -61,7 +61,7 @@ class HandleVerifySign
 
         $clientSign = $request->input('sign');
         if ($expectedSign !== $clientSign) {
-            return Response::json(['code' => 401, 'msg' => '签名错误']);
+            return Response::json(['code' => 1401, 'msg' => '签名错误']);
         }
 
         return $next($request);
