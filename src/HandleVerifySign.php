@@ -38,6 +38,14 @@ class HandleVerifySign
         $data['timestamp'] = $timestamp;
         $data['key'] = $request->input('key', '');
         $data['uuid'] = $request->input('uuid', '');
+
+        //验证参数正确性
+        if (!in_array($data['clientType'],app('config')->get('middleware.sign.key'))){
+            return Response::json(['code' => 401, 'msg' => '非法请求']);
+        }
+
+        $secret = app('config')->get('middleware.sign.secret')[$data['clientType']];
+
         ksort($data);
 
         $requestPath = $request->path();
@@ -49,7 +57,8 @@ class HandleVerifySign
         }
         $stringToSign = $stringToSign . 'action=' . $requestPath;
 
-        $expectedSign = md5($stringToSign);
+        $expectedSign = md5(md5($stringToSign).$secret);
+
         $clientSign = $request->input('sign');
         if ($expectedSign !== $clientSign) {
             return Response::json(['code' => 401, 'msg' => '签名错误']);

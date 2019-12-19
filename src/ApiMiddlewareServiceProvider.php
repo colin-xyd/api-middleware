@@ -9,16 +9,26 @@ class ApiMiddlewareServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        $this->app->middleware([HandleVerifySign::class]);
+        //
     }
 
     public function register()
     {
         $this->mergeConfigFrom($this->configPath(), 'middleware');
+        $this->registerMiddleware();
     }
 
     protected function configPath()
     {
         return __DIR__ . '/../config/middleware.php';
+    }
+
+    /**
+     * Register the middleware.
+     * @return void
+     */
+    protected function registerMiddleware()
+    {
+        app()->middleware([HandleVerifySign::class]);
     }
 }
