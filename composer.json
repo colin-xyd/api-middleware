@@ -1,0 +1,23 @@
+{
+    "name": "colin/api-middleware",
+    "description": "api-middleware",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "xuyaodong",
+            "email": "791728301@qq.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "illuminate/support": ">=5.7.0",
+        "illuminate/http": ">=5.7.0",
+        "ext-json": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Colin\\Api\\Middleware\\": "src/"
+        }
+    }
+}
