@@ -16,6 +16,7 @@ return [
             "android"   => "555EA9100240DCF2F4AA63C814604496"
         ],
         "type" => ['pc','h5','ios','android']
-    ]
+    ],
+    "allow_time"=>10,//允许接口调用时间差分钟
 
 ];

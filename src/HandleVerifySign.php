@@ -2,6 +2,7 @@
 
 namespace Colin\Api\Middleware;
 
+use Cache;
 use Closure;
 use Illuminate\Http\Request;
 use Colin\Api\Middleware\Support\Response;
@@ -27,7 +28,9 @@ class HandleVerifySign
         // 检查时间戳
         $timestamp = $request->input('timestamp');
         $now = time();
-        if (!$timestamp || !is_numeric($timestamp) || $timestamp < $now - 60 * 5 || $timestamp > $now + 60 * 5) {
+
+        $allow_time = (int)(app('config')->get('middleware.allow_time') / 2);
+        if (!$timestamp || !is_numeric($timestamp) || $timestamp < $now - $allow_time || $timestamp > $now + $allow_time) {
             return Response::json(['code' => 1403, 'msg' => '请求过期']);
         }
 
@@ -38,6 +41,15 @@ class HandleVerifySign
         $data['timestamp'] = $timestamp;
         $data['key'] = $request->input('key', '');
         $data['uuid'] = $request->input('uuid', '');
+
+        if (empty($data['uuid'])){
+            return Response::json(['code' => 1403, 'msg' => '非法请求']);
+        }
+
+        if (Cache::get('api-uuid'.$data['uuid'])){
+            return Response::json(['code' => 1403, 'msg' => '非法请求']);
+        }
+
 
         //验证参数正确性
         if (!in_array($data['clientType'],app('config')->get('middleware.sign.key'))){
@@ -63,7 +75,7 @@ class HandleVerifySign
         if ($expectedSign !== $clientSign) {
             return Response::json(['code' => 1401, 'msg' => '签名错误']);
         }
-
+        Cache::put('api-uuid'.$data['uuid'],1,$allow_time);//记录uuid
         return $next($request);
     }
 
